@@ -1,0 +1,24 @@
+# Base de datos en tu PC con Docker Desktop:
+#   docker compose up -d --build
+# Conexión: localhost:3307 · usuario root · contraseña root · base mdrmarket_new
+# (puerto 3307 para no chocar con el MySQL de Laragon, que usa 3306)
+#
+# Para empezar de cero (borra todos los datos):
+#   docker compose down -v
+services:
+  db:
+    build: .
+    container_name: mdrmarket-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-proot"]
+      interval: 5s
+      retries: 20
+
+volumes:
+  db_data:

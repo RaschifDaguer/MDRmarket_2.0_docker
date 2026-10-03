@@ -1,0 +1,8 @@
+# Volcado de la base anterior: tiene datos personales, tokens de sesión y
+# contraseñas cifradas de usuarios reales. Nunca se sube al repositorio.
+mdrmarket (1).original.sql
+*.original.sql
+
+# Respaldos y exportaciones locales
+*.bak
+backup*/
