@@ -10,3 +10,12 @@ FROM mysql:8.4
 ENV TZ=UTC
 
 COPY mdrmarketnewdatabase.sql /docker-entrypoint-initdb.d/01-mdrmarket.sql
+
+# Configuración para poca memoria (el plan gratuito de Railway da 0.5 GB):
+# sin performance_schema (ahorra ~150 MB), buffer de InnoDB chico y pocas
+# conexiones simultáneas. Suficiente para pruebas; se puede subir en un plan mayor.
+CMD ["mysqld", \
+     "--performance-schema=OFF", \
+     "--innodb-buffer-pool-size=64M", \
+     "--max-connections=40", \
+     "--skip-name-resolve"]
