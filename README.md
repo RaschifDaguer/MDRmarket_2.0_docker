@@ -41,17 +41,32 @@ Queda en `localhost:3307`, usuario `root`, contraseña `root`, base `mdrmarket_n
 En phpMyAdmin → **Importar** → `mdrmarketnewdatabase.sql`. El script crea la
 base `mdrmarket_new` sola; no hace falta seleccionar una antes.
 
-## Publicarla en Railway
+## Producción: Aiven
 
-1. En Railway: **New → GitHub Repo →** este repositorio. Railway detecta el `Dockerfile`.
-2. En el servicio, pestaña **Variables**, agregar `MYSQL_ROOT_PASSWORD` con una contraseña segura.
-3. Pestaña **Settings → Volumes**: agregar un volumen montado en `/var/lib/mysql` (sin esto los datos se borran en cada despliegue).
-4. La API se conecta por la red privada de Railway:
-   `DB_HOST=<nombre-del-servicio>.railway.internal`, `DB_PORT=3306`,
-   `DB_DATABASE=mdrmarket_new`, `DB_USERNAME=root`, `DB_PASSWORD=<la misma de arriba>`.
+La base de producción está en **Aiven for MySQL 8.4** (plan Free, servicio
+`mdrmarket-db`, conexión con SSL), **no** en Docker. Se probó un MySQL propio
+en Railway, pero el plan gratuito de Railway no alcanza para una base encendida
+todo el día. El Docker de este repo queda para **uso local**.
 
-> El script solo se ejecuta cuando el volumen está vacío. Para aplicar una
-> versión nueva del script hay que borrar el volumen o importarlo a mano.
+- Copia exacta de la base de Aiven: [`mdrmarket_new_aiven_2026-10-03.sql`](mdrmarket_new_aiven_2026-10-03.sql)
+  (el comienzo del archivo explica el caso Aiven).
+- Conectarse y aplicar cambios:
+  [docs/BASE_DE_DATOS.md](https://github.com/RaschifDaguer/MDRmarket_2.0/blob/main/docs/BASE_DE_DATOS.md)
+  del repo de código.
+
+## Cambiar la estructura
+
+> 🚨 **Nunca importes `mdrmarketnewdatabase.sql` ni la copia de Aiven en
+> producción:** empiezan borrando las tablas y se pierden los datos reales.
+
+1. Escribe el cambio en un archivo nuevo dentro de [`cambios/`](cambios/)
+   (ej. `cambios/2026-10-15_agregar_propina.sql` con el `ALTER TABLE`).
+2. Agrega el mismo cambio al script maestro, para instalaciones nuevas.
+3. Pruébalo en local (Laragon o Docker).
+4. Haz un respaldo de producción y aplica **solo el archivo de `cambios/`** en Aiven.
+
+El `Dockerfile` usa poca memoria (performance_schema apagado, buffer de 64 MB)
+para correr en servidores chicos; en local no molesta.
 
 ## Notas
 
