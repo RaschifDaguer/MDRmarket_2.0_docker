@@ -138,6 +138,9 @@ CREATE TABLE usuario (
                     COMMENT 'Última vista usada en la app (botón "cambiar a vista…")',
   activo            TINYINT(1) NOT NULL DEFAULT 1,
   remember_token    VARCHAR(100) NULL,
+  -- Verificación en dos pasos del panel admin (cifradas con el APP_KEY de la API).
+  app_authentication_secret         TEXT NULL COMMENT 'Clave del autenticador del panel admin (cifrada con APP_KEY)',
+  app_authentication_recovery_codes TEXT NULL COMMENT 'Códigos de recuperación del panel admin (cifrados con APP_KEY)',
   created_at        TIMESTAMP NULL,
   updated_at        TIMESTAMP NULL,
   deleted_at        TIMESTAMP NULL,
