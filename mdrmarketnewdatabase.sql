@@ -959,11 +959,13 @@ INSERT INTO tipo_documento (id, codigo, nombre, descripcion, ambito, condicion_v
 (4, 'licencia_conducir', 'Licencia de conducir',          'Foto de la licencia vigente',                'persona',  'requiere_licencia'),
 (5, 'nit',               'Certificado de NIT',            'Solo si el negocio tiene NIT',               'negocio',  NULL),
 (6, 'foto_vehiculo',     'Foto del vehículo',             'Foto completa del vehículo, de costado',     'vehiculo', NULL),
-(7, 'foto_placa',        'Foto de la placa',              'Foto donde se lea bien la placa',            'vehiculo', 'requiere_placa');
+(7, 'foto_placa',        'Foto de la placa',              'Foto donde se lea bien la placa',            'vehiculo', 'requiere_placa'),
+(8, 'foto_rostro',       'Foto del rostro (selfie)',      'Selfie de frente para compararla con la foto del carnet', 'persona', NULL);
 
 -- Cambiar `obligatorio` o agregar filas aquí para pedir más o menos documentos.
 -- Repartidor (moto/auto/camioneta/camión): CI anverso y reverso, licencia,
 -- foto del vehículo, foto de la placa y RUAT. Bicicleta: CI y foto del vehículo.
+-- Repartidor y comerciante: además, una selfie para comparar con el carnet.
 INSERT INTO requisito_rol (rol, tipo_documento_id, obligatorio) VALUES
 ('repartidor',  1, 1),
 ('repartidor',  2, 1),
@@ -971,9 +973,11 @@ INSERT INTO requisito_rol (rol, tipo_documento_id, obligatorio) VALUES
 ('repartidor',  4, 1),
 ('repartidor',  6, 1),
 ('repartidor',  7, 1),
+('repartidor',  8, 1),
 ('comerciante', 1, 1),
 ('comerciante', 2, 1),
-('comerciante', 5, 0);
+('comerciante', 5, 0),
+('comerciante', 8, 1);
 
 -- Motivos de reporte (agregar o desactivar filas según haga falta).
 INSERT INTO motivo_reporte (id, codigo, nombre, aplica_a, gravedad) VALUES
