@@ -1138,9 +1138,9 @@ INSERT INTO vehiculo (id, repartidor_id, tipo_vehiculo_id, placa, en_uso, estado
 
 -- ---------- Negocios (mismo id que el antiguo `comerciante`) ----------
 INSERT INTO negocio (id, usuario_id, categoria_id, nombre, descripcion, nit, razon_social, telefono, direccion, latitud, longitud, logo_url, banner_url, estado_verificacion, created_at, updated_at) VALUES
-(2,  2,  3,    'TechStore SCZ', 'Tu tienda de tecnología y gadgets en el corazón de Equipetrol. Envíos rápidos a toda la ciudad.', NULL, NULL, '59177001001', 'Av. San Martín 453, Equipetrol, Santa Cruz', -17.7745000, -63.1935000, 'https://placehold.co/150/1a237e/ffffff?text=Tech',  'https://placehold.co/600x200/1a237e/ffffff?text=TechStore+SCZ',        'aprobado',  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
-(3,  3,  1,    'Sabor Cruceño', 'Auténtica gastronomía cruceña. Salteñas, empanadas, platos tradicionales con ingredientes frescos.', NULL, NULL, '59177002002', 'Calle Junín 320, Centro Histórico, Santa Cruz', -17.7859000, -63.1816000, 'https://placehold.co/150/e65100/ffffff?text=Sabor', 'https://placehold.co/600x200/e65100/ffffff?text=Sabor+Cruce%C3%B1o', 'aprobado',  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
-(4,  4,  2,    'FarmaSuper',    'Farmacia y supermercado. Medicamentos, cuidado personal y productos de primera necesidad las 24 horas.', NULL, NULL, '59177003003', 'Av. Beni 1560, 2do Anillo, Santa Cruz', -17.7696000, -63.1658000, 'https://placehold.co/150/1b5e20/ffffff?text=Farma', 'https://placehold.co/600x200/1b5e20/ffffff?text=FarmaSuper', 'aprobado',  '2026-06-16 16:31:38', '2026-06-16 16:31:38');
+(2,  2,  3,    'TechStore SCZ', 'Tu tienda de tecnología y gadgets en el corazón de Equipetrol. Envíos rápidos a toda la ciudad.', NULL, NULL, '59177001001', 'Av. San Martín 453, Equipetrol, Santa Cruz', -17.7745000, -63.1935000, 'https://placehold.co/150/1a237e/ffffff.png?text=Tech',  'https://placehold.co/600x200/1a237e/ffffff.png?text=TechStore+SCZ',        'aprobado',  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
+(3,  3,  1,    'Sabor Cruceño', 'Auténtica gastronomía cruceña. Salteñas, empanadas, platos tradicionales con ingredientes frescos.', NULL, NULL, '59177002002', 'Calle Junín 320, Centro Histórico, Santa Cruz', -17.7859000, -63.1816000, 'https://placehold.co/150/e65100/ffffff.png?text=Sabor', 'https://placehold.co/600x200/e65100/ffffff.png?text=Sabor+Cruce%C3%B1o', 'aprobado',  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
+(4,  4,  2,    'FarmaSuper',    'Farmacia y supermercado. Medicamentos, cuidado personal y productos de primera necesidad las 24 horas.', NULL, NULL, '59177003003', 'Av. Beni 1560, 2do Anillo, Santa Cruz', -17.7696000, -63.1658000, 'https://placehold.co/150/1b5e20/ffffff.png?text=Farma', 'https://placehold.co/600x200/1b5e20/ffffff.png?text=FarmaSuper', 'aprobado',  '2026-06-16 16:31:38', '2026-06-16 16:31:38');
 
 -- ---------- Productos ----------
 INSERT INTO producto (id, negocio_id, categoria_id, categoria_vehiculo_id, nombre, descripcion, precio, precio_oferta, stock, created_at, updated_at) VALUES
@@ -1172,32 +1172,32 @@ INSERT INTO producto (id, negocio_id, categoria_id, categoria_vehiculo_id, nombr
 (26, 4,  204 , NULL, 'Vitamina C 1000 mg (30 comp)', 'Suplemento efervescente. Refuerza el sistema inmunológico.', 18.00, NULL, 70, '2026-06-16 16:31:40', '2026-06-16 16:31:40');
 
 INSERT INTO producto_imagen (id, producto_id, url, orden, es_principal, created_at, updated_at) VALUES
-(1,  1,  'https://placehold.co/400x300/1a237e/ffffff?text=Auriculares+Bluetooth+Premium', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(2,  2,  'https://placehold.co/400x300/1a237e/ffffff?text=Cable+USB-C+a+USB-A+2m', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(3,  3,  'https://placehold.co/400x300/1a237e/ffffff?text=Memoria+USB+64+GB+USB+3.0', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(4,  4,  'https://placehold.co/400x300/1a237e/ffffff?text=Cargador+Inal%C3%A1mbrico+15+W', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(5,  5,  'https://placehold.co/400x300/1a237e/ffffff?text=Teclado+Mec%C3%A1nico+Compacto', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(6,  6,  'https://placehold.co/400x300/1a237e/ffffff?text=Mouse+Inal%C3%A1mbrico+Ergon%C3%B3mico', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(7,  7,  'https://placehold.co/400x300/1a237e/ffffff?text=Hub+USB-C+7+en+1', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(8,  8,  'https://placehold.co/400x300/1a237e/ffffff?text=Control+para+PC%2FConsola', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(9,  9,  'https://placehold.co/400x300/e65100/ffffff?text=Salte%C3%B1a+de+Pollo', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(10, 10, 'https://placehold.co/400x300/e65100/ffffff?text=Salte%C3%B1a+de+Carne', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(11, 11, 'https://placehold.co/400x300/e65100/ffffff?text=Empanada+de+Queso', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(12, 12, 'https://placehold.co/400x300/e65100/ffffff?text=Arroz+con+Pollo+Criollo', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(13, 13, 'https://placehold.co/400x300/e65100/ffffff?text=Hamburguesa+Especial', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(14, 14, 'https://placehold.co/400x300/e65100/ffffff?text=Sopa+de+Man%C3%AD', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(15, 15, 'https://placehold.co/400x300/e65100/ffffff?text=Refresco+de+Mocochinchi', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(16, 16, 'https://placehold.co/400x300/e65100/ffffff?text=Combo+Almuerzo+Completo', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(17, 17, 'https://placehold.co/400x300/1b5e20/ffffff?text=Paracetamol+500+mg+%2820+comp%29', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(18, 18, 'https://placehold.co/400x300/1b5e20/ffffff?text=Ibuprofeno+400+mg+%2815+comp%29', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(19, 19, 'https://placehold.co/400x300/1b5e20/ffffff?text=Alcohol+Isoprop%C3%ADlico+500+ml', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(20, 20, 'https://placehold.co/400x300/1b5e20/ffffff?text=Shampoo+Anti-Caspa+400+ml', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(21, 21, 'https://placehold.co/400x300/1b5e20/ffffff?text=Crema+Hidratante+Facial+50+g', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(22, 22, 'https://placehold.co/400x300/1b5e20/ffffff?text=Jab%C3%B3n+Antibacterial+x3', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(23, 23, 'https://placehold.co/400x300/1b5e20/ffffff?text=Leche+Entera+1+L', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(24, 24, 'https://placehold.co/400x300/1b5e20/ffffff?text=Arroz+1+kg', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(25, 25, 'https://placehold.co/400x300/1b5e20/ffffff?text=Aceite+Vegetal+1+L', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
-(26, 26, 'https://placehold.co/400x300/1b5e20/ffffff?text=Vitamina+C+1000+mg+%2830+comp%29', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40');
+(1,  1,  'https://placehold.co/400x300/1a237e/ffffff.png?text=Auriculares+Bluetooth+Premium', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(2,  2,  'https://placehold.co/400x300/1a237e/ffffff.png?text=Cable+USB-C+a+USB-A+2m', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(3,  3,  'https://placehold.co/400x300/1a237e/ffffff.png?text=Memoria+USB+64+GB+USB+3.0', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(4,  4,  'https://placehold.co/400x300/1a237e/ffffff.png?text=Cargador+Inal%C3%A1mbrico+15+W', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(5,  5,  'https://placehold.co/400x300/1a237e/ffffff.png?text=Teclado+Mec%C3%A1nico+Compacto', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(6,  6,  'https://placehold.co/400x300/1a237e/ffffff.png?text=Mouse+Inal%C3%A1mbrico+Ergon%C3%B3mico', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(7,  7,  'https://placehold.co/400x300/1a237e/ffffff.png?text=Hub+USB-C+7+en+1', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(8,  8,  'https://placehold.co/400x300/1a237e/ffffff.png?text=Control+para+PC%2FConsola', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(9,  9,  'https://placehold.co/400x300/e65100/ffffff.png?text=Salte%C3%B1a+de+Pollo', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(10, 10, 'https://placehold.co/400x300/e65100/ffffff.png?text=Salte%C3%B1a+de+Carne', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(11, 11, 'https://placehold.co/400x300/e65100/ffffff.png?text=Empanada+de+Queso', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(12, 12, 'https://placehold.co/400x300/e65100/ffffff.png?text=Arroz+con+Pollo+Criollo', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(13, 13, 'https://placehold.co/400x300/e65100/ffffff.png?text=Hamburguesa+Especial', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(14, 14, 'https://placehold.co/400x300/e65100/ffffff.png?text=Sopa+de+Man%C3%AD', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(15, 15, 'https://placehold.co/400x300/e65100/ffffff.png?text=Refresco+de+Mocochinchi', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(16, 16, 'https://placehold.co/400x300/e65100/ffffff.png?text=Combo+Almuerzo+Completo', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(17, 17, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Paracetamol+500+mg+%2820+comp%29', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(18, 18, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Ibuprofeno+400+mg+%2815+comp%29', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(19, 19, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Alcohol+Isoprop%C3%ADlico+500+ml', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(20, 20, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Shampoo+Anti-Caspa+400+ml', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(21, 21, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Crema+Hidratante+Facial+50+g', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(22, 22, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Jab%C3%B3n+Antibacterial+x3', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(23, 23, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Leche+Entera+1+L', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(24, 24, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Arroz+1+kg', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(25, 25, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Aceite+Vegetal+1+L', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40'),
+(26, 26, 'https://placehold.co/400x300/1b5e20/ffffff.png?text=Vitamina+C+1000+mg+%2830+comp%29', 0, 1, '2026-06-16 16:31:40', '2026-06-16 16:31:40');
 
 -- =====================================================================
 -- 8. VISTAS
