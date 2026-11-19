@@ -132,6 +132,8 @@ CREATE TABLE usuario (
   ci_complemento    VARCHAR(5)   NOT NULL DEFAULT '' COMMENT 'Complemento del CI (si tiene)',
   ci_expedido       ENUM('LP','CB','SC','OR','PT','CH','TJ','BE','PD') NULL,
   fecha_nacimiento  DATE NULL,
+  terminos_version  VARCHAR(20) NULL COMMENT 'Versión de los términos y condiciones que aceptó (incluye declarar que es mayor de 18)',
+  terminos_aceptados_en TIMESTAMP NULL COMMENT 'Cuándo los aceptó',
   foto_perfil_url   VARCHAR(500) NULL,
   es_admin          TINYINT(1) NOT NULL DEFAULT 0,
   rol_activo        ENUM('cliente','repartidor','comerciante','admin') NOT NULL DEFAULT 'cliente'
@@ -173,13 +175,17 @@ CREATE TABLE direccion (
 --    negocio  -> uno por negocio (NIT)
 --  condicion_vehiculo: si no es NULL, solo se pide cuando el tipo de vehículo
 --    tiene ese requisito (ej. a una bicicleta no se le pide placa ni licencia).
+--  condicion_negocio: si no es NULL, solo se pide a negocios con alguno de esos
+--    permisos (licorería = alcohol, farmacia).
 CREATE TABLE tipo_documento (
   id                 SMALLINT UNSIGNED NOT NULL AUTO_INCREMENT,
   codigo             VARCHAR(50)  NOT NULL,
   nombre             VARCHAR(100) NOT NULL,
   descripcion        VARCHAR(255) NULL,
+  instrucciones_revision VARCHAR(600) NULL COMMENT 'Qué tiene que revisar el administrador antes de aprobarlo',
   ambito             ENUM('persona','vehiculo','negocio') NOT NULL DEFAULT 'persona',
   condicion_vehiculo ENUM('requiere_placa','requiere_ruat','requiere_licencia') NULL,
+  condicion_negocio  SET('alcohol','farmacia') NULL COMMENT 'Si no es NULL, solo se pide a negocios con alguno de esos permisos',
   activo             TINYINT(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (id),
   UNIQUE KEY uq_tipo_documento_codigo (codigo)
@@ -276,6 +282,8 @@ CREATE TABLE categoria (
   nombre             VARCHAR(100) NOT NULL,
   icono              VARCHAR(16)  NULL COMMENT 'Emoji o nombre de ícono',
   descripcion        VARCHAR(255) NULL,
+  solo_mayores       TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Solo para mayores de 18 (bebidas alcohólicas): el cliente confirma su edad y el repartidor pide el carnet',
+  permiso            ENUM('alcohol','farmacia') NULL COMMENT 'Permiso que necesita el negocio para vender aquí (ver negocio.vende_alcohol / es_farmacia)',
   orden              SMALLINT UNSIGNED NOT NULL DEFAULT 0,
   activo             TINYINT(1) NOT NULL DEFAULT 1,
   created_at         TIMESTAMP NULL,
@@ -295,6 +303,8 @@ CREATE TABLE negocio (
   descripcion             TEXT NULL,
   nit                     VARCHAR(20)  NULL COMMENT 'Opcional: si no tiene, se usa el CI del dueño',
   razon_social            VARCHAR(200) NULL,
+  vende_alcohol           TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Vende bebidas alcohólicas (licorería): autorización de expendio + licencia de funcionamiento',
+  es_farmacia             TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Farmacia: resolución del SEDES + licencia de funcionamiento',
   telefono                VARCHAR(20)  NULL,
   direccion               VARCHAR(255) NULL,
   referencia              VARCHAR(255) NULL,
@@ -369,6 +379,7 @@ CREATE TABLE producto (
   oferta_fin            DATETIME NULL,
   stock                 INT UNSIGNED NULL COMMENT 'NULL = sin control de stock (ej. comida hecha al momento)',
   disponible            TINYINT(1) NOT NULL DEFAULT 1,
+  venta_libre_confirmada_en TIMESTAMP NULL COMMENT 'Medicamentos: cuándo confirmó la farmacia que se vende sin receta médica',
   rating_promedio       DECIMAL(3,2) NULL,
   total_resenas         INT UNSIGNED NOT NULL DEFAULT 0,
   total_vendidos        INT UNSIGNED NOT NULL DEFAULT 0,
@@ -440,6 +451,7 @@ CREATE TABLE pedido (
   longitud_entrega               DECIMAL(10,7) NOT NULL,
   anillo_entrega                 TINYINT UNSIGNED NULL COMMENT 'Anillo de la dirección de entrega (se calcula solo)',
   notas                         VARCHAR(500) NULL,
+  solo_mayores                  TINYINT(1) NOT NULL DEFAULT 0 COMMENT 'Lleva productos para mayores de 18: el cliente confirmó su edad y aceptó la declaración de compra; el repartidor pide el carnet',
   categoria_vehiculo_requerida_id TINYINT UNSIGNED NULL,
   estado                         ENUM('pendiente','confirmado','preparando','listo','en_camino','entregado','cancelado','rechazado')
                                  NOT NULL DEFAULT 'pendiente',
@@ -962,6 +974,21 @@ INSERT INTO tipo_documento (id, codigo, nombre, descripcion, ambito, condicion_v
 (7, 'foto_placa',        'Foto de la placa',              'Foto donde se lea bien la placa',            'vehiculo', 'requiere_placa'),
 (8, 'foto_rostro',       'Foto del rostro (selfie)',      'Selfie de frente para compararla con la foto del carnet', 'persona', NULL);
 
+-- Permisos de licorerías y farmacias (solo se piden a negocios con ese permiso).
+INSERT INTO tipo_documento (id, codigo, nombre, descripcion, instrucciones_revision, ambito, condicion_vehiculo, condicion_negocio) VALUES
+(10, 'autorizacion_alcohol', 'Autorización de expendio de bebidas alcohólicas',
+     'Permiso especial de la Alcaldía para vender bebidas alcohólicas (Seguridad Ciudadana o Administración Tributaria)',
+     'Debe estar vigente, a nombre del negocio o de su dueño y con la misma dirección. Si tiene código QR, léelo para verificarla en la página de la Alcaldía.',
+     'negocio', NULL, 'alcohol'),
+(11, 'licencia_funcionamiento', 'Licencia de funcionamiento municipal',
+     'El cartón de la licencia de la Alcaldía. En "Actividad" o "Rubro" debe decir lo que vendes (licorería o farmacia)',
+     'En "Actividad" o "Rubro" debe decir "Expendio de bebidas alcohólicas" o "Licorería" (si vende alcohol) o "Farmacia" (si vende medicamentos). Si dice "Pulpería" o "Micromercado", NO está autorizado para vender alcohol: recházala. Lee el QR del cartón para ver en la página de la Alcaldía si está vigente, con deudas o clausurado.',
+     'negocio', NULL, 'alcohol,farmacia'),
+(12, 'resolucion_sedes', 'Resolución de apertura y funcionamiento (SEDES)',
+     'Resolución administrativa del SEDES de tu departamento que autoriza a la farmacia a funcionar',
+     'Emitida por el SEDES, vigente, a nombre de la farmacia y con la misma dirección.',
+     'negocio', NULL, 'farmacia');
+
 -- Cambiar `obligatorio` o agregar filas aquí para pedir más o menos documentos.
 -- Repartidor (moto/auto/camioneta/camión): CI anverso y reverso, licencia,
 -- foto del vehículo, foto de la placa y RUAT. Bicicleta: CI y foto del vehículo.
@@ -977,7 +1004,11 @@ INSERT INTO requisito_rol (rol, tipo_documento_id, obligatorio) VALUES
 ('comerciante', 1, 1),
 ('comerciante', 2, 1),
 ('comerciante', 5, 0),
-('comerciante', 8, 1);
+('comerciante', 8, 1),
+-- Licorerías (alcohol) y farmacias: ver tipo_documento.condicion_negocio.
+('comerciante', 10, 1),
+('comerciante', 11, 1),
+('comerciante', 12, 1);
 
 -- Motivos de reporte (agregar o desactivar filas según haga falta).
 INSERT INTO motivo_reporte (id, codigo, nombre, aplica_a, gravedad) VALUES
@@ -1040,7 +1071,7 @@ INSERT INTO tarifa_envio (categoria_vehiculo_id, km_hasta, precio, created_at, u
 
 -- ---------- Categorías (se separó el emoji del nombre) ----------
 INSERT INTO categoria (id, nombre, icono, descripcion, orden, created_at, updated_at) VALUES
-(1,  'Alimentos y Bebidas',               '🍔', 'Comida, snacks y bebidas',                      1,  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
+(1,  'Alimentos',                         '🍔', 'Comida preparada, abarrotes, panadería y snacks', 1, '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
 (2,  'Salud y Belleza',                   '💊', 'Cuidado personal, salud y cosmética',           2,  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
 (3,  'Tecnología',                        '💻', 'Electrónica, gadgets y accesorios tech',        3,  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
 (4,  'Hogar, Decoración y Muebles',       '🏠', 'Muebles, decoración y artículos del hogar',     4,  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
@@ -1051,13 +1082,16 @@ INSERT INTO categoria (id, nombre, icono, descripcion, orden, created_at, update
 (9,  'Entretenimiento',                   '🎮', 'Juegos, ocio y entretenimiento',                9,  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
 (10, 'Oficina y Papelería',               '🏢', 'Suministros de oficina y papelería',            10, '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
 (11, 'Bebés y Niños',                     '👶', 'Productos para bebés y niños',                  11, '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
-(12, 'Ferretería, Construcción y Jardín', '🔨', 'Herramientas, construcción y jardinería',       12, '2026-06-16 16:31:37', '2026-06-16 16:31:37');
+(12, 'Ferretería, Construcción y Jardín', '🔨', 'Herramientas, construcción y jardinería',       12, '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
+(13, 'Bebidas',                           '🥤', 'Gaseosas, jugos, agua y más (sin alcohol)',      13, NOW(), NOW()),
+(14, 'Bebidas alcohólicas',               '🍷', 'Cervezas, vinos y licores. Venta solo a mayores de 18 años', 14, NOW(), NOW()),
+(15, 'Tabaco',                            '🚬', 'Cigarrillos y tabaco. Venta prohibida a menores de 18 años', 15, NOW(), NOW());
 
 -- Subcategorías (agregar o desactivar filas libremente).
 INSERT INTO categoria (id, categoria_padre_id, nombre, icono, orden, created_at, updated_at) VALUES
 (101,  1, 'Restaurantes y comida preparada', '🍽️', 1, NOW(), NOW()),
 (102,  1, 'Supermercado y abarrotes',        '🛒', 2, NOW(), NOW()),
-(103,  1, 'Bebidas',                         '🥤', 3, NOW(), NOW()),
+(103, 13, 'Gaseosas, jugos y refrescos',     '🥤', 1, NOW(), NOW()),
 (104,  1, 'Panadería y repostería',          '🥐', 4, NOW(), NOW()),
 (105,  1, 'Snacks y dulces',                 '🍫', 5, NOW(), NOW()),
 (201,  2, 'Farmacia y medicamentos',         '💊', 1, NOW(), NOW()),
@@ -1103,7 +1137,21 @@ INSERT INTO categoria (id, categoria_padre_id, nombre, icono, orden, created_at,
 (1202, 12, 'Materiales de construcción',     '🧱', 2, NOW(), NOW()),
 (1203, 12, 'Electricidad e iluminación',     '💡', 3, NOW(), NOW()),
 (1204, 12, 'Plomería',                       '🚰', 4, NOW(), NOW()),
-(1205, 12, 'Jardinería',                     '🌱', 5, NOW(), NOW());
+(1205, 12, 'Jardinería',                     '🌱', 5, NOW(), NOW()),
+(1302, 13, 'Agua y hielo',                   '💧', 2, NOW(), NOW()),
+(1303, 13, 'Energizantes e isotónicas',      '⚡', 3, NOW(), NOW()),
+(1304, 13, 'Café, té e infusiones',          '☕', 4, NOW(), NOW()),
+(1401, 14, 'Cervezas',                       '🍺', 1, NOW(), NOW()),
+(1402, 14, 'Vinos y espumantes',             '🍷', 2, NOW(), NOW()),
+(1403, 14, 'Singani y licores',              '🥃', 3, NOW(), NOW()),
+(1404, 14, 'Cócteles y bebidas preparadas',  '🍹', 4, NOW(), NOW()),
+(1501, 15, 'Cigarrillos y tabaco',           '🚬', 1, NOW(), NOW());
+
+-- Bebidas alcohólicas: solo mayores de 18 y solo negocios con el permiso.
+-- Tabaco: solo mayores de 18 (Ley 1280). Medicamentos: solo farmacias.
+UPDATE categoria SET solo_mayores = 1, permiso = 'alcohol' WHERE id = 14 OR categoria_padre_id = 14;
+UPDATE categoria SET solo_mayores = 1 WHERE id = 15 OR categoria_padre_id = 15;
+UPDATE categoria SET permiso = 'farmacia' WHERE id = 201;
 
 -- ---------- Usuarios ----------
 -- Los dueños de negocios semilla (2, 3, 4) no tienen apellido ni CI: la app
@@ -1141,6 +1189,9 @@ INSERT INTO negocio (id, usuario_id, categoria_id, nombre, descripcion, nit, raz
 (2,  2,  3,    'TechStore SCZ', 'Tu tienda de tecnología y gadgets en el corazón de Equipetrol. Envíos rápidos a toda la ciudad.', NULL, NULL, '59177001001', 'Av. San Martín 453, Equipetrol, Santa Cruz', -17.7745000, -63.1935000, 'https://placehold.co/150/1a237e/ffffff.png?text=Tech',  'https://placehold.co/600x200/1a237e/ffffff.png?text=TechStore+SCZ',        'aprobado',  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
 (3,  3,  1,    'Sabor Cruceño', 'Auténtica gastronomía cruceña. Salteñas, empanadas, platos tradicionales con ingredientes frescos.', NULL, NULL, '59177002002', 'Calle Junín 320, Centro Histórico, Santa Cruz', -17.7859000, -63.1816000, 'https://placehold.co/150/e65100/ffffff.png?text=Sabor', 'https://placehold.co/600x200/e65100/ffffff.png?text=Sabor+Cruce%C3%B1o', 'aprobado',  '2026-06-16 16:31:37', '2026-06-16 16:31:37'),
 (4,  4,  2,    'FarmaSuper',    'Farmacia y supermercado. Medicamentos, cuidado personal y productos de primera necesidad las 24 horas.', NULL, NULL, '59177003003', 'Av. Beni 1560, 2do Anillo, Santa Cruz', -17.7696000, -63.1658000, 'https://placehold.co/150/1b5e20/ffffff.png?text=Farma', 'https://placehold.co/600x200/1b5e20/ffffff.png?text=FarmaSuper', 'aprobado',  '2026-06-16 16:31:38', '2026-06-16 16:31:38');
+
+-- FarmaSuper vende medicamentos: es farmacia (la app le pide sus permisos).
+UPDATE negocio SET es_farmacia = 1 WHERE id = 4;
 
 -- ---------- Productos ----------
 INSERT INTO producto (id, negocio_id, categoria_id, categoria_vehiculo_id, nombre, descripcion, precio, precio_oferta, stock, created_at, updated_at) VALUES
@@ -1528,12 +1579,16 @@ BEGIN
                           AND d.tipo_documento_id = td.id
                           AND d.estado <> 'rechazado')
     UNION ALL
-    -- Documentos de cada NEGOCIO (NIT, si se marca obligatorio).
+    -- Documentos de cada NEGOCIO (NIT si se marca obligatorio; permisos de
+    -- licorería o farmacia solo si el negocio tiene ese permiso).
     SELECT CONCAT('documento.', td.codigo, ':negocio', n.id)
       FROM requisito_rol rr
       JOIN tipo_documento td ON td.id = rr.tipo_documento_id
       JOIN negocio n         ON n.usuario_id = p_usuario_id AND n.deleted_at IS NULL
      WHERE rr.rol = p_rol AND rr.obligatorio = 1 AND td.activo = 1 AND td.ambito = 'negocio'
+       AND (td.condicion_negocio IS NULL
+            OR (n.vende_alcohol = 1 AND FIND_IN_SET('alcohol', td.condicion_negocio) > 0)
+            OR (n.es_farmacia = 1 AND FIND_IN_SET('farmacia', td.condicion_negocio) > 0))
        AND NOT EXISTS (SELECT 1 FROM documento d
                         WHERE d.negocio_id = n.id
                           AND d.tipo_documento_id = td.id
